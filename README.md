@@ -1,7 +1,7 @@
 SimpleImage
 ===========
 
-SimpleImage, e uma classe criada com o intuito de facilitar a manipulação de imagens no php.
+SimpleImage, e uma classe criada com o intuito de facilitar a manipulação de imagens no php, necessária as extensões Exif e GD.
 
 
 Exemplo
