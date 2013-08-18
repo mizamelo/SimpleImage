@@ -7,7 +7,7 @@ SimpleImage, e uma classe criada com o intuito de facilitar a manipulação de ima
 Exemplo
 -------
 
-	require 'SimpleImage.php';
+	require 'SimpleImage/SimpleImage.php';
 	
 	$simple = new SimpleImage('../imagem/teste.png');
 	
@@ -74,6 +74,12 @@ Funções
 	
 	// salva imagem, caso não seja informado o nome, ele gera um hash e salva
 	$simple->save();
+	
+	
+Observações
+-----------
+
+Atualmente a classe so trabalha com 3 tipos de imagem, PNG, JPEG e GIF.
 
 	
 	
