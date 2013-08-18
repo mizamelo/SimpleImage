@@ -41,7 +41,39 @@ Funções
 	// redimensiona a imagem, para os novos parâmetros informados proporcionalmente
 	$simple->resizeProportional($newWidth, $newHeigth);
 	
-	// copia uma imagem para outra, informand a posição da sobreposição
+	// copia uma imagem para outra, informando a posição da sobreposição
 	$simple->merge('../imagem/nova.gif', $percToRight, $percToBottom);
+	
+	// retorna a altura da imagem
+	$simple->getHeight();
+	
+	// retorna a largura da imagem
+	$simple->getWidth();
+	
+	// retorna o tamanho da imagem
+	$simple->getSize();
+	
+	// retorna o tipo da imagem
+	$simple->getType();
+	
+	// retorna o caminho da imagem
+	$simple->getFile();
+	
+	// escreve na imagem
+	* necessário setar a fonte primeiro
+	$simple->write($texto, $percToRight, $percToBottom);
+	
+	// setar a fonte que será usada durante a escrita
+	$simple->setFont($caminho);
+	
+	// seta a cor da fonte
+	$simple->setFontColor($hexadecimal);
+	
+	// seta o tamanho da fonte
+	$simple->setFontSize($size);
+	
+	// salva imagem, caso não seja informado o nome, ele gera um hash e salva
+	$simple->save();
+
 	
 	
