@@ -4,7 +4,7 @@ if (!extension_loaded('exif')) {
 }
 
 if (!extension_loaded('gd')) {
-    throw new WideImage_Exception("SimpleImage needs the GD  PHP extension.");
+    throw new Exception("SimpleImage needs the GD  PHP extension.");
 }
 
 class SimpleImage
