@@ -26,14 +26,16 @@ class SimpleImage
     private $fontSize = 14;
 
     private $fontColor;
+	
+	private $name;
 
-    const GIF  = '.GIF';
+    const GIF  = '.gif';
 
-    const JPEG = '.JPEG';
+    const JPEG = '.jpeg';
 
-    const PNG  = '.PNG';
+    const PNG  = '.png';
 
-    public static $types = array(1  => '.GIF', 2  => '.JPEG', 3  => '.PNG');
+    public static $types = array(1  => '.gif', 2  => '.jpeg', 3  => '.png');
 
     public function __construct($image = null)
     {
@@ -48,6 +50,7 @@ class SimpleImage
         $this->setHeight($this->getImageHeight($this->newImage));
         $this->setFile($image);
         $this->setSize($this->getImageSize($this->file));
+		$this->setName(sha1(md5($image . microtime())));
     }
 
     private function updateValues($image)
@@ -219,6 +222,11 @@ class SimpleImage
         }
     }
 
+	public function setName($name)
+    {
+        $this->name = $name;
+    }
+	
     public function setImage($image = null)
     {
         $this->initialize($image);
@@ -264,6 +272,11 @@ class SimpleImage
         $this->fontColor = $this->hexaToRgb($hexadecimal);
     }
 
+	public function getName()
+    {
+        return $this->name;
+    }	
+	
     public function getSize()
     {
         return $this->size;
@@ -310,10 +323,10 @@ class SimpleImage
 
     private function getImageType($image)
     {
-        if (!array_key_exists(exif_imagetype($image), self::$types)) {
+        if (!array_key_exists(strtolower(exif_imagetype($image)), self::$types)) {
             throw new InvalidArgumentException('Image type not supported.');
         }
-        return self::$types[exif_imagetype($image)];
+        return self::$types[strtolower(exif_imagetype($image))];
     }
 
     private function getImageWidth($img)
@@ -392,11 +405,11 @@ class SimpleImage
         }
     }
 
-    public function save($path = null)
+    public function save($path = '')
     {
         $this->validNewImage();
 
-        $path = (is_null($path)) ? sha1(uniqid().$this->getFile()) : $path;
+        $path = $path . DIRECTORY_SEPARATOR . $this->name;
 
         if ($this->getType() == self::PNG) {
             imagepng($this->newImage, $path.self::PNG, 9);
@@ -408,7 +421,7 @@ class SimpleImage
 
         $this->clean();
 
-        return $path.$this->getType();
+        return $this->name.$this->getType();
     }
 
     private function clean()
