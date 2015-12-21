@@ -221,6 +221,11 @@ class SimpleImage
             imagettftext($this->newImage, $this->getFontSize(), 0, $x, $y, $color, $this->getFont(), $text);
         }
     }
+	
+	public function toPB()
+    {      
+		imagefilter($this->newImage, IMG_FILTER_GRAYSCALE);
+    }
 
 	public function setName($name)
     {
