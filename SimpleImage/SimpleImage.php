@@ -111,27 +111,15 @@ class SimpleImage
         $this->updateValues($this->newImage);
     }
 
-    public function rotate90()
+    public function imageRotate($ang)
     {
-        $this->imageRotate(90);
-    }
-
-    public function rotate180()
-    {
-        $this->imageRotate(180);
-    }
-
-    public function rotate270()
-    {
-        $this->imageRotate(270);
-    }
-
-    private function imageRotate($ang)
-    {
-        $this->validNumber(array($ang));
-        $temp = $this->createNewImage($this->getWidth(), $this->getHeight(), $this->getType());
-        $this->copy($temp);
-        $this->newImage = imagerotate($this->newImage, $ang, 0);
+        $this->validNumber(array($ang));		
+		$this->cloneImage(self::PNG);		
+        $temp = $this->createNewImage($this->getWidth(), $this->getHeight(), $this->getType());	        
+		$this->copy($temp);		
+        $this->newImage = imagerotate($this->newImage, $ang, imagecolorallocatealpha( $temp,0,0,0,127 ), 1);		
+		imagealphablending( $this->newImage, false );		
+		imagesavealpha( $this->newImage, true );		
         $this->updateValues($this->newImage);
     }
 
@@ -191,7 +179,13 @@ class SimpleImage
 
         $x = $this->getWidth() * ($percentToRight / 100);
         $y = $this->getHeight() * ($percentToBottom / 100);
-
+		
+		/*
+		$quebra = (($sizeImage - $boxText[2])-$x);		
+		
+		imagettftext($this->newImage, $this->getFontSize(), 0, $x, $y, $color, $this->getFont(), wordwrap($text, '36'));
+		*/
+		
         if ($sizeText > $sizeImage) {
             $words = explode(' ', $text);
             $count = 0;
@@ -200,7 +194,7 @@ class SimpleImage
             for ($a = 1; $a <= count($words); $a++ ) {
                 $tmp = $this->getTextSize($newArray[$count]);
 
-                if ($tmp[2] <= $sizeImage - ($percentToRight + $this->getWidth() * 0.11)) {
+                if ($tmp[2] <= $sizeImage - ($percentToRight + $this->getWidth() * 0.21)) {
                     $newArray[$count].= isset($words[$a]) ? ' '.$words[$a] : '';
                 } else {
                     $count++;
@@ -221,12 +215,12 @@ class SimpleImage
             imagettftext($this->newImage, $this->getFontSize(), 0, $x, $y, $color, $this->getFont(), $text);
         }
     }
-	
+
 	public function toPB()
     {      
 		imagefilter($this->newImage, IMG_FILTER_GRAYSCALE);
     }
-
+	
 	public function setName($name)
     {
         $this->name = $name;
@@ -423,6 +417,8 @@ class SimpleImage
         } else if ($this->getType() == self::GIF) {
             imagegif($this->newImage, $path.self::GIF, 9);
         }
+
+        $this->clean();
 
         return $this->name.$this->getType();
     }
