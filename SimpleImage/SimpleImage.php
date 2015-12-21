@@ -221,6 +221,35 @@ class SimpleImage
 		imagefilter($this->newImage, IMG_FILTER_GRAYSCALE);
     }
 	
+	public function setBrightness($number)
+    {      
+		$this->validNumber(array($number));
+		imagefilter($this->newImage, IMG_FILTER_BRIGHTNESS, $number);
+    }
+		
+	public function setContrast($number)
+    {      
+		$this->validNumber(array($number));
+		imagefilter($this->newImage, IMG_FILTER_CONTRAST, $number);
+    }
+	
+	public function toNegative()
+    {      
+		imagefilter($this->newImage, IMG_FILTER_NEGATE);
+    }
+	
+	public function toPixel($size, $effect = true)
+    {      
+		$this->validNumber(array($size));
+		imagefilter($this->newImage, IMG_FILTER_PIXELATE, $size, $effect);
+    }	
+	
+	public function addColorFilter($hex1, $hex2, $hex3, $opacity)
+    {      
+		$this->validNumber(array($hex1, $hex2, $hex3, $opacity));
+		imagefilter($this->newImage, IMG_FILTER_COLORIZE, $hex1, $hex2, $hex3, $opacity);
+    }		
+	
 	public function setName($name)
     {
         $this->name = $name;
@@ -418,12 +447,10 @@ class SimpleImage
             imagegif($this->newImage, $path.self::GIF, 9);
         }
 
-        $this->clean();
-
         return $this->name.$this->getType();
     }
 
-    private function clean()
+    public function clean()
     {
         imagedestroy($this->newImage);
         $this->newImage = null;
