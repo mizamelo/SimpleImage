@@ -424,8 +424,6 @@ class SimpleImage
             imagegif($this->newImage, $path.self::GIF, 9);
         }
 
-        $this->clean();
-
         return $this->name.$this->getType();
     }
 
