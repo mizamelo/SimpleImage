@@ -14,6 +14,8 @@ class SimpleImage
     private $height;
 
     private $type;
+	
+	private $ext;
 
     private $size;
 
@@ -36,8 +38,8 @@ class SimpleImage
 	const JPG = '.jpg';
 
     const PNG  = '.png';
-	
-    public static $types = array('gif' => '.gif', 'jpeg' => '.jpeg', 'png' => '.png', 'jpg' => '.jpg');
+	    
+	public static $types = array(1 => '.gif', 2 => '.jpeg', 3 => '.png');
 
     public function __construct($image = null)
     {
@@ -67,7 +69,7 @@ class SimpleImage
 		
         if ($this->getImageType($image) == self::GIF) {
             return imagecreatefromgif($image);
-        } else if (self::getImageType($image) == self::JPEG || self::getImageType($image) == self::JPG) {
+        } else if (self::getImageType($image) == self::JPEG) {
             return imagecreatefromjpeg($image);
         } else if (self::getImageType($image) == self::PNG) {
             return imagecreatefrompng($image);
@@ -356,14 +358,10 @@ class SimpleImage
 
     private function getImageType($image)
     {
-		$ext = pathinfo($image)['extension'];
-		
-		if(!array_key_exists($ext, self::$types))
-		{
-			throw new InvalidArgumentException('Image type not supported.');
-		}
-		
-        return self::$types[$ext];
+		if (!array_key_exists(strtolower(exif_imagetype($image)), self::$types)) {
+            throw new InvalidArgumentException('Image type not supported.');
+        }
+        return self::$types[strtolower(exif_imagetype($image))];
     }
 
     private function getImageWidth($img)
@@ -452,19 +450,19 @@ class SimpleImage
         $this->validNewImage();
 
         $path = $path . DIRECTORY_SEPARATOR . $this->name;
-
+		
         if ($this->getType() == self::PNG) {            
 			imagealphablending( $this->newImage, false );		
 			imagesavealpha( $this->newImage, true );	
 			
 			imagepng($this->newImage, $path.self::PNG, 9);
-        } else if ($this->getType() == self::JPEG || $this->getType() == self::JPG) {
+        } else if ($this->getType() == self::JPEG) {
             imagejpeg($this->newImage, $path.$this->getType(), 75);
         } else if ($this->getType() == self::GIF) {
             imagegif($this->newImage, $path.self::GIF, 9);
         }
 
-        return $this->name.$this->getType();
+        return $this->name . $this->getType();		
     }
 
     public function clean()
