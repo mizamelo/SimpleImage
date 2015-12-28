@@ -29,13 +29,15 @@ class SimpleImage
 	
 	private $name;
 
-    const GIF  = '.gif';
+	const GIF  = '.gif';
 
     const JPEG = '.jpeg';
+	
+	const JPG = '.jpg';
 
     const PNG  = '.png';
-
-    public static $types = array(1  => '.gif', 2  => '.jpeg', 3  => '.png');
+	
+    public static $types = array('gif' => '.gif', 'jpeg' => '.jpeg', 'png' => '.png', 'jpg' => '.jpg');
 
     public function __construct($image = null)
     {
@@ -61,11 +63,11 @@ class SimpleImage
 
     private function createImage($image)
     {
-        $this->isValid($image);
-
+        $this->isValid($image);			
+		
         if ($this->getImageType($image) == self::GIF) {
             return imagecreatefromgif($image);
-        } else if (self::getImageType($image) == self::JPEG) {
+        } else if (self::getImageType($image) == self::JPEG || self::getImageType($image) == self::JPG) {
             return imagecreatefromjpeg($image);
         } else if (self::getImageType($image) == self::PNG) {
             return imagecreatefrompng($image);
@@ -97,6 +99,11 @@ class SimpleImage
     {
         $this->cloneImage(self::JPEG);
     }
+	
+	 public function cloneToJPG()
+    {
+        $this->cloneImage(self::JPG);
+    }
 
     public function cloneToGIF()
     {
@@ -117,9 +124,7 @@ class SimpleImage
 		$this->cloneImage(self::PNG);		
         $temp = $this->createNewImage($this->getWidth(), $this->getHeight(), $this->getType());	        
 		$this->copy($temp);		
-        $this->newImage = imagerotate($this->newImage, $ang, imagecolorallocatealpha( $temp,0,0,0,127 ), 1);		
-		imagealphablending( $this->newImage, false );		
-		imagesavealpha( $this->newImage, true );		
+        $this->newImage = imagerotate($this->newImage, $ang, imagecolorallocatealpha( $temp,0,0,0,127 ), 1);	
         $this->updateValues($this->newImage);
     }
 
@@ -351,10 +356,14 @@ class SimpleImage
 
     private function getImageType($image)
     {
-        if (!array_key_exists(strtolower(exif_imagetype($image)), self::$types)) {
-            throw new InvalidArgumentException('Image type not supported.');
-        }
-        return self::$types[strtolower(exif_imagetype($image))];
+		$ext = pathinfo($image)['extension'];
+		
+		if(!array_key_exists($ext, self::$types))
+		{
+			throw new InvalidArgumentException('Image type not supported.');
+		}
+		
+        return self::$types[$ext];
     }
 
     private function getImageWidth($img)
@@ -431,6 +440,11 @@ class SimpleImage
         if (is_null($file)) {
             throw new OutOfBoundsException('Image not found.');
         }
+		
+		if(!getimagesize($file))
+		{
+			throw new RuntimeException('Image is broken');		
+		}
     }
 
     public function save($path = '')
@@ -439,10 +453,13 @@ class SimpleImage
 
         $path = $path . DIRECTORY_SEPARATOR . $this->name;
 
-        if ($this->getType() == self::PNG) {
-            imagepng($this->newImage, $path.self::PNG, 9);
-        } else if ($this->getType() == self::JPEG) {
-            imagejpeg($this->newImage, $path.self::JPEG, 75);
+        if ($this->getType() == self::PNG) {            
+			imagealphablending( $this->newImage, false );		
+			imagesavealpha( $this->newImage, true );	
+			
+			imagepng($this->newImage, $path.self::PNG, 9);
+        } else if ($this->getType() == self::JPEG || $this->getType() == self::JPG) {
+            imagejpeg($this->newImage, $path.$this->getType(), 75);
         } else if ($this->getType() == self::GIF) {
             imagegif($this->newImage, $path.self::GIF, 9);
         }
