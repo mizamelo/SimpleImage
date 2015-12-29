@@ -32,14 +32,12 @@ class SimpleImage
 	private $name;
 
 	const GIF  = '.gif';
-
-    const JPEG = '.jpeg';
 	
 	const JPG = '.jpg';
 
     const PNG  = '.png';
 	    
-	public static $types = array(1 => '.gif', 2 => '.jpeg', 3 => '.png');
+	public static $types = array(1 => '.gif', 2 => '.jpg', 3 => '.png');
 
     public function __construct($image = null)
     {
@@ -69,7 +67,7 @@ class SimpleImage
 		
         if ($this->getImageType($image) == self::GIF) {
             return imagecreatefromgif($image);
-        } else if (self::getImageType($image) == self::JPEG) {
+        } else if (self::getImageType($image) == self::JPG) {
             return imagecreatefromjpeg($image);
         } else if (self::getImageType($image) == self::PNG) {
             return imagecreatefrompng($image);
@@ -97,12 +95,7 @@ class SimpleImage
         $this->cloneImage(self::PNG);
     }
 
-    public function cloneToJPEG()
-    {
-        $this->cloneImage(self::JPEG);
-    }
-	
-	 public function cloneToJPG()
+	public function cloneToJPG()
     {
         $this->cloneImage(self::JPG);
     }
@@ -134,7 +127,7 @@ class SimpleImage
     {
         $this->validNumber(array($width, $height));
         $temp = $this->createNewImage($width, $height, $this->getType());
-        imagecopyresampled($temp, $this->newImage, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
+        imagecopyresampled(imagecolorallocatealpha( $temp,0,0,0,127 ), $this->newImage, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
         $this->newImage = $temp;
         $this->updateValues($temp);
     }
@@ -155,7 +148,7 @@ class SimpleImage
         $x = $this->getWidth() * ($percentToRight / 100);
         $y = $this->getHeight() * ($percentToBottom / 100);
 
-        imagecopyresampled($temp, $this->newImage, 0, 0, $x, $y, $width, $height, $width, $height);
+        imagecopyresampled(imagecolorallocatealpha( $temp,0,0,0,127 ), $this->newImage, 0, 0, $x, $y, $width, $height, $width, $height);
         $this->newImage = $temp;
         $this->updateValues($temp);
     }
@@ -168,7 +161,7 @@ class SimpleImage
         $x = $this->getWidth() * ($percentToRight / 100);
         $y = $this->getHeight() * ($percentToBottom / 100);
 
-        imagecopy($this->newImage, $temp, $x, $y, 0, 0, $this->getImageWidth($temp), $this->getImageHeight($temp));
+        imagecopy($this->newImage, imagecolorallocatealpha( $temp,0,0,0,127 ), $x, $y, 0, 0, $this->getImageWidth($temp), $this->getImageHeight($temp));
         $this->updateValues($this->newImage);
     }
 
@@ -449,17 +442,17 @@ class SimpleImage
     {
         $this->validNewImage();
 
-        $path = $path . DIRECTORY_SEPARATOR . $this->name;
+        $path = $path . DIRECTORY_SEPARATOR . $this->name . $this->getType();			
 		
         if ($this->getType() == self::PNG) {            
 			imagealphablending( $this->newImage, false );		
 			imagesavealpha( $this->newImage, true );	
-			
-			imagepng($this->newImage, $path.self::PNG, 9);
-        } else if ($this->getType() == self::JPEG) {
-            imagejpeg($this->newImage, $path.$this->getType(), 75);
-        } else if ($this->getType() == self::GIF) {
-            imagegif($this->newImage, $path.self::GIF, 9);
+				
+			imagepng($this->newImage, $path, 9);
+        } else if ($this->getType() == self::JPG) {        
+			imagejpeg($this->newImage, $path, 75);
+        } else if ($this->getType() == self::GIF) {            
+			imagegif($this->newImage, $path, 9);
         }
 
         return $this->name . $this->getType();		
