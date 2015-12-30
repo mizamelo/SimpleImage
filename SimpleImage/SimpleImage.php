@@ -127,7 +127,7 @@ class SimpleImage
     {
         $this->validNumber(array($width, $height));
         $temp = $this->createNewImage($width, $height, $this->getType());
-        imagecopyresampled(imagecolorallocatealpha( $temp,0,0,0,127 ), $this->newImage, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
+        imagecopyresampled($temp, $this->newImage, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
         $this->newImage = $temp;
         $this->updateValues($temp);
     }
@@ -148,7 +148,7 @@ class SimpleImage
         $x = $this->getWidth() * ($percentToRight / 100);
         $y = $this->getHeight() * ($percentToBottom / 100);
 
-        imagecopyresampled(imagecolorallocatealpha( $temp,0,0,0,127 ), $this->newImage, 0, 0, $x, $y, $width, $height, $width, $height);
+        imagecopyresampled($temp, $this->newImage, 0, 0, $x, $y, $width, $height, $width, $height);
         $this->newImage = $temp;
         $this->updateValues($temp);
     }
@@ -161,7 +161,7 @@ class SimpleImage
         $x = $this->getWidth() * ($percentToRight / 100);
         $y = $this->getHeight() * ($percentToBottom / 100);
 
-        imagecopy($this->newImage, imagecolorallocatealpha( $temp,0,0,0,127 ), $x, $y, 0, 0, $this->getImageWidth($temp), $this->getImageHeight($temp));
+        imagecopy($this->newImage, $temp, $x, $y, 0, 0, $this->getImageWidth($temp), $this->getImageHeight($temp));
         $this->updateValues($this->newImage);
     }
 
