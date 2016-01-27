@@ -14,8 +14,6 @@ class SimpleImage
     private $height;
 
     private $type;
-	
-	private $ext;
 
     private $size;
 
@@ -31,13 +29,13 @@ class SimpleImage
 	
 	private $name;
 
-	const GIF  = '.gif';
-	
-	const JPG = '.jpg';
+    const GIF  = '.gif';
+
+    const JPEG = '.jpeg';
 
     const PNG  = '.png';
-	    
-	public static $types = array(1 => '.gif', 2 => '.jpg', 3 => '.png');
+
+    public static $types = array(1  => '.gif', 2  => '.jpeg', 3  => '.png');
 
     public function __construct($image = null)
     {
@@ -63,11 +61,11 @@ class SimpleImage
 
     private function createImage($image)
     {
-        $this->isValid($image);			
-		
+        $this->isValid($image);
+
         if ($this->getImageType($image) == self::GIF) {
             return imagecreatefromgif($image);
-        } else if (self::getImageType($image) == self::JPG) {
+        } else if (self::getImageType($image) == self::JPEG) {
             return imagecreatefromjpeg($image);
         } else if (self::getImageType($image) == self::PNG) {
             return imagecreatefrompng($image);
@@ -79,10 +77,14 @@ class SimpleImage
         $this->validNumber(array($width, $height));
 
         if ($this->getImageType($this->getFile()) == self::GIF) {
-            return imagecreate($width, $height);
+            $img = imagecreate($width, $height);
         } else {
-            return imagecreatetruecolor($width, $height);
+            $img = imagecreatetruecolor($width, $height);
+			imagealphablending($img, false);
+			imagesavealpha($img,true);
         }
+		
+		return $img;
     }
 
     private function copy($temp)
@@ -95,9 +97,9 @@ class SimpleImage
         $this->cloneImage(self::PNG);
     }
 
-	public function cloneToJPG()
+    public function cloneToJPEG()
     {
-        $this->cloneImage(self::JPG);
+        $this->cloneImage(self::JPEG);
     }
 
     public function cloneToGIF()
@@ -119,14 +121,14 @@ class SimpleImage
 		$this->cloneImage(self::PNG);		
         $temp = $this->createNewImage($this->getWidth(), $this->getHeight(), $this->getType());	        
 		$this->copy($temp);		
-        $this->newImage = imagerotate($this->newImage, $ang, imagecolorallocatealpha( $temp,0,0,0,127 ), 1);	
+        $this->newImage = imagerotate($this->newImage, $ang, imagecolorallocatealpha( $temp,0,0,0,127 ), 1);				
         $this->updateValues($this->newImage);
     }
 
     public function resize($width = null, $height = null)
     {
         $this->validNumber(array($width, $height));
-        $temp = $this->createNewImage($width, $height, $this->getType());
+        $temp = $this->createNewImage($width, $height, $this->getType());		
         imagecopyresampled($temp, $this->newImage, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
         $this->newImage = $temp;
         $this->updateValues($temp);
@@ -226,7 +228,7 @@ class SimpleImage
 		$this->validNumber(array($number));
 		imagefilter($this->newImage, IMG_FILTER_BRIGHTNESS, $number);
     }
-		
+	
 	public function setContrast($number)
     {      
 		$this->validNumber(array($number));
@@ -351,7 +353,7 @@ class SimpleImage
 
     private function getImageType($image)
     {
-		if (!array_key_exists(strtolower(exif_imagetype($image)), self::$types)) {
+        if (!array_key_exists(strtolower(exif_imagetype($image)), self::$types)) {
             throw new InvalidArgumentException('Image type not supported.');
         }
         return self::$types[strtolower(exif_imagetype($image))];
@@ -442,20 +444,17 @@ class SimpleImage
     {
         $this->validNewImage();
 
-        $path = $path . DIRECTORY_SEPARATOR . $this->name . $this->getType();			
-		
-        if ($this->getType() == self::PNG) {            
-			imagealphablending( $this->newImage, false );		
-			imagesavealpha( $this->newImage, true );	
-				
-			imagepng($this->newImage, $path, 9);
-        } else if ($this->getType() == self::JPG) {        
-			imagejpeg($this->newImage, $path, 75);
-        } else if ($this->getType() == self::GIF) {            
-			imagegif($this->newImage, $path, 9);
+        $path = $path . DIRECTORY_SEPARATOR . $this->name;
+
+        if ($this->getType() == self::PNG) {
+            imagepng($this->newImage, $path.self::PNG, 9);
+        } else if ($this->getType() == self::JPEG) {
+            imagejpeg($this->newImage, $path.self::JPEG, 75);
+        } else if ($this->getType() == self::GIF) {
+            imagegif($this->newImage, $path.self::GIF, 9);
         }
 
-        return $this->name . $this->getType();		
+        return $this->name.$this->getType();
     }
 
     public function clean()
